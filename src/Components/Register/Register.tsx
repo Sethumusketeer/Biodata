@@ -15,7 +15,7 @@ const Register: React.FC<RegisterProps> = ({ changeRoute }) => {
   const [password, setPassword] = useState('');
 
   const handleRegister = async (event: FormEvent) => {
-    event.preventDefault(); // Prevents the default form submit action
+    event.preventDefault(); 
     try {
       const response = await fetch('https://localhost:7259/api/user/register', {
         method: 'POST',

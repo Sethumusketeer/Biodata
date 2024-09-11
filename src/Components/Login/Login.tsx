@@ -22,6 +22,7 @@ const theme = createTheme({
 const Login: React.FC<LoginProps> = ({ setUser, changeRoute }) => {
   const [empId, setEmpId] = useState<number | "">("");
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async () => {
     try {
@@ -36,18 +37,22 @@ const Login: React.FC<LoginProps> = ({ setUser, changeRoute }) => {
         })
       });
 
-      const userData: UserData = await response.json();
-      
       if (response.ok) {
-        setUser({empId: userData.empId, password: userData.password});
+        const userData: UserData = await response.json();
+        setUser({ empId: userData.empId, password: userData.password });
         changeRoute('profile');
       } else {
-        console.error(userData);
+        const errorData = await response.json();
+        setError(errorData.message || 'Login failed');
       }
-
     } catch (error) {
       console.error('Error:', error);
+      setError('An unexpected error occurred');
     }
+  };
+
+  const handleForgotPassword = () => {
+    changeRoute('forgot-password');
   };
 
   const onIdChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -57,12 +62,12 @@ const Login: React.FC<LoginProps> = ({ setUser, changeRoute }) => {
   const onPasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
   };
-  
+
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     handleLogin();
   };
-  
+
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -75,6 +80,7 @@ const Login: React.FC<LoginProps> = ({ setUser, changeRoute }) => {
         onSubmit={onSubmit}
       >
         <h2>Login</h2>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
         <TextField
           variant="outlined"
           margin="normal"
@@ -99,6 +105,13 @@ const Login: React.FC<LoginProps> = ({ setUser, changeRoute }) => {
           onClick={() => changeRoute('register')}
         >
           Register
+        </Button>
+        <Button
+          variant="text"
+          style={{ marginTop: '1rem' }}
+          onClick={handleForgotPassword}
+        >
+          Forgot Password?
         </Button>
       </Box>
     </ThemeProvider>
